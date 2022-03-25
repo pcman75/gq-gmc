@@ -15,7 +15,6 @@ import serial.tools.list_ports                  # allows listing of serial ports
 aoconfig = dict()
 
 if(pathlib.Path('/data/options.json').is_file()):
-    # Session name, API ID and hash to use; loaded from config file
     with open('/data/options.json') as f:
         aoconfig = json.load(f)
 else:
@@ -34,7 +33,6 @@ def readGMC():
     
     while True:
         try:
-            time.sleep(0.1)
             # open the serial port with selected settings
             ser = serial.Serial(aoconfig["GMCport"], aoconfig["GMCbaudrate"], timeout = aoconfig["GMCtimeout"])
             
@@ -51,6 +49,7 @@ def readGMC():
                 time.sleep(0.1)
         
         except Exception as e:
+            time.sleep(1)
             print(e)  
 
 
