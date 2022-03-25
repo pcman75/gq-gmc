@@ -11,10 +11,10 @@ arch:
 options:
   GMCport: /dev/cu.usbserial-1410
   GMCbaudrate: 115200
-  GMCtimeout: 3
+  #GMCtimeout: 3
   UpdateInterval: 10
 schema:
   GMCport: str
   GMCbaudrate: "int(1,99999999)"
-  GMCtimeout: "int(1, 30)"
+  #GMCtimeout: "int(1, 30)"
   UpdateInterval: "int(1, 600)"
