@@ -1,6 +1,6 @@
 name: "GQ GMC"
 description: "Nuclear radiation sensor using serial"
-version: "1.0.12"
+version: "1.0.13"
 slug: "gq-gmc"
 arch:
   - aarch64
@@ -11,10 +11,10 @@ arch:
 options:
   GMCport: /dev/cu.usbserial-1410
   GMCbaudrate: 115200
-  #GMCtimeout: 3
-  #UpdateInterval: 10
+  GMCtimeout: 3
+  UpdateInterval: 10
 schema:
   GMCport: str
-  GMCbaudrate: "int(1,99999999)"
-  #GMCtimeout: "int(1, 30)"
-  #UpdateInterval: "int(1, 600)"
+  GMCbaudrate: "list(57600,115200)"
+  GMCtimeout: "int(1,30)"
+  UpdateInterval: "int(1,600)"
