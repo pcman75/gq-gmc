@@ -1,0 +1,18 @@
+name: "GQ GMC"
+description: "Nuclear radiation sensor using serial"
+version: "1.0.10"
+slug: "gq-gmc"
+arch:
+  - aarch64
+  - amd64
+  - armhf
+  - armv7
+  - i386
+options:
+  - GMCport: "/dev/cu.usbserial-1410"
+  - GMCbaudrate: "115200"
+  - GMCtimeout: 3
+schema:
+  - GMCport: "str"
+  - GMCbaudrate: "int(1,99999999)"
+  - GMCtimeout: "int(1, 30)"

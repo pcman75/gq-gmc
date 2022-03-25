@@ -127,3 +127,4 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+gq-gmc/.DS_Store
