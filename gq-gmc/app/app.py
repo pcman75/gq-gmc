@@ -19,9 +19,7 @@ if(pathlib.Path('/data/options.json').is_file()):
         aoconfig = json.load(f)
 else:
     with open(pathlib.Path(__file__).parent.resolve()/'../config.yaml') as f:
-        options = yaml.safe_load(f)["options"]
-        for val in options:
-            aoconfig.update(val)
+        aoconfig = yaml.safe_load(f)["options"]
             
 def readGMC():
     
