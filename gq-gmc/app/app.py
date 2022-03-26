@@ -1,8 +1,4 @@
-
-import enum
-import queue
-import time, json, yaml              # basic modules
-from os.path import exists
+import json, yaml, threading            # basic modules
 import pathlib
 
 
@@ -21,34 +17,29 @@ else:
     with open(pathlib.Path(__file__).parent.resolve()/'../config.yaml') as f:
         aoconfig = yaml.safe_load(f)["options"]
             
-def readGMC():
-    
-    cpmq = queue.Queue(60)
-    cpm = 0
-    
-    for i in range(60):
-        cpmq.put(0)  
-    
-    while True:
-        try:
-            # open the serial port with selected settings
+
+def readCPM(ser):
+    try:
+        if not ser.isOpen():
             ser = serial.Serial(aoconfig["GMCport"], aoconfig["GMCbaudrate"], timeout = aoconfig["GMCtimeout"])
-            
-            while True:
-                bwrt = ser.write(b'<HEARTBEAT1>>')  # send count per second data to host every second automatically
-                
-                srec = ser.read(2)    
-                value = srec[0] << 8 | srec[1]
-                value = value & 0x3fff   # mask out high bits, as for CPS* calls on 300 series counters
-                cpm = cpm - cpmq.get() + value        
-                cpmq.put(value)
-                
-                print('CPS = ', value, ' CPM = ', cpm, ' μSv/h = ', cpm*0.39/60)
-                time.sleep(0.1)
         
-        except Exception as e:
-            time.sleep(1)
-            print(e)  
-
-
-readGMC()
+        bwrt = ser.write(b'<GETCPM>>')
+        srec = ser.read(2)
+        if len(srec) == 2:    
+            value = srec[0] << 8 | srec[1]
+            value = value & 0x3fff   # mask out high bits, as for CPS* calls on 300 series counters
+            print('CPM = ', value)
+        
+    except Exception as e:
+        ser.close()
+        print(e)  
+            
+    threading.Timer(1, readCPM, [ser]).start()
+    
+def main():
+    ser = serial.Serial()
+    
+    readCPM(ser) 
+    
+if __name__ == '__main__':
+    main()
