@@ -34,7 +34,7 @@ def readCPM():
             if len(srec) == 2:    
                 value = srec[0] << 8 | srec[1]
                 logger.info(f"CPM = {value}")
-                #triggerSensor("gmc_gq_cpm", value, logger)
+                triggerSensor("gmc_gq_cpm", value, logger)
         
     except Exception as e:
         logger.error(e)  
