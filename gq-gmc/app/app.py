@@ -1,4 +1,4 @@
-import json, yaml, threading, logging            # basic modules
+import json, yaml, threading, logging           # basic modules
 import pathlib
 
 
@@ -6,12 +6,13 @@ import pathlib
 import serial                                   # communication with serial port
 import serial.tools.list_ports                  # allows listing of serial ports
 
+
 from hassapi import triggerSensor
 
 logger = logging.getLogger()
 handler = logging.StreamHandler()
 formatter = logging.Formatter(
-        '%(asctime)s %(name)-12s %(levelname)-8s %(message)s')
+        '%(asctime)s %(levelname)-8s %(message)s')
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.setLevel(logging.DEBUG)
@@ -25,27 +26,23 @@ else:
         aoconfig = yaml.safe_load(f)["options"]
             
 
-def readCPM(ser):
+def readCPM():
     try:
-        if not ser.isOpen():
-            ser = serial.Serial(aoconfig["GMCport"], aoconfig["GMCbaudrate"], timeout = aoconfig["GMCtimeout"])
-        
-        bwrt = ser.write(b'<GETCPM>>')
-        srec = ser.read(2)
-        if len(srec) == 2:    
-            value = srec[0] << 8 | srec[1]
-            value = value & 0x3fff   # mask out high bits, as for CPS* calls on 300 series counters
-            logger.info(f"CPM = {value}")
-            #triggerSensor("gmc_gq_cpm", value, logger)
+        with serial.Serial(aoconfig["GMCport"], aoconfig["GMCbaudrate"], timeout = aoconfig["GMCtimeout"]) as ser:
+            bwrt = ser.write(b'<GETCPM>>')
+            srec = ser.read(2)
+            if len(srec) == 2:    
+                value = srec[0] << 8 | srec[1]
+                logger.info(f"CPM = {value}")
+                #triggerSensor("gmc_gq_cpm", value, logger)
         
     except Exception as e:
-        ser.close()
         logger.error(e)  
             
-    threading.Timer(aoconfig["UpdateInterval"], readCPM, [ser]).start()
+    threading.Timer(aoconfig["UpdateInterval"], readCPM).start()
     
 def main():
-    readCPM(serial.Serial()) 
+    readCPM()
     
 if __name__ == '__main__':
     main()

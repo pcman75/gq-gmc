@@ -13,7 +13,7 @@ devices:
   - "/dev/ttyUSB0"
 
 options:
-  GMCport: /dev/cu.usbserial-1410
+  GMCport: /dev/ttyUSB0
   GMCbaudrate: 115200
   GMCtimeout: 3
   UpdateInterval: 10
