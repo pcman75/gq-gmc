@@ -2,6 +2,8 @@ import os, requests
 
 
 def triggerSensor(name, state, logger):
+    
+    logger.debug(f'Bearer {os.environ["SUPERVISOR_TOKEN"]}')
     headers = {
         'Authorization': f'Bearer {os.environ["SUPERVISOR_TOKEN"]}',
         "content-type": "application/json"
@@ -9,7 +11,7 @@ def triggerSensor(name, state, logger):
 
     entity = {
         "state": state,
-        "state_class": "measurement",
+        #"state_class": "measurement",
         "attributes": {
             "friendly_name": name, 
         }
