@@ -23,7 +23,7 @@ formatter = logging.Formatter(
         '%(asctime)s %(levelname)-8s %(message)s')
 handler.setFormatter(formatter)
 logger.addHandler(handler)
-logger.setLevel(logging._nameToLevel(aoconfig["LogLevel"]))
+logger.setLevel(logging._nameToLevel[aoconfig["LogLevel"]])
 
 
 def readCPM():
