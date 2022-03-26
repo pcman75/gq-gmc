@@ -16,7 +16,10 @@ def triggerSensor(name, state, logger):
             "friendly_name": name, 
         }
     }
-    response = requests.post(f'http://supervisor/core/api/states/{name}', headers=headers, json = entity, timeout=3)
+    
+    logger.debug(f'posting to http://supervisor/core/api/states/{name}')
+    
+    response = requests.post(f'http://supervisor/core/api/states/{name}', headers=headers, json = entity)#, timeout=3)
     if( not response.ok):
         logger.error(f'failed to trigger {name} Error: {response.text}')
 

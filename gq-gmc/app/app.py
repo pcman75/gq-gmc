@@ -36,7 +36,7 @@ def readCPM(ser):
             value = srec[0] << 8 | srec[1]
             value = value & 0x3fff   # mask out high bits, as for CPS* calls on 300 series counters
             logger.info(f"CPM = {value}")
-            triggerSensor("gmc_gq_cpm", value, logger)
+            #triggerSensor("gmc_gq_cpm", value, logger)
         
     except Exception as e:
         ser.close()
