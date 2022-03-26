@@ -9,15 +9,7 @@ import serial.tools.list_ports                  # allows listing of serial ports
 
 from hassapi import triggerSensor
 
-logger = logging.getLogger()
-handler = logging.StreamHandler()
-formatter = logging.Formatter(
-        '%(asctime)s %(levelname)-8s %(message)s')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-logger.setLevel(logging.DEBUG)
 aoconfig = dict()
-
 if(pathlib.Path('/data/options.json').is_file()):
     with open('/data/options.json') as f:
         aoconfig = json.load(f)
@@ -25,6 +17,14 @@ else:
     with open(pathlib.Path(__file__).parent.resolve()/'../config.yaml') as f:
         aoconfig = yaml.safe_load(f)["options"]
             
+logger = logging.getLogger()
+handler = logging.StreamHandler()
+formatter = logging.Formatter(
+        '%(asctime)s %(levelname)-8s %(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+logger.setLevel(logging._nameToLevel(aoconfig["LogLevel"]))
+
 
 def readCPM():
     try:
@@ -34,7 +34,7 @@ def readCPM():
             if len(srec) == 2:    
                 value = srec[0] << 8 | srec[1]
                 logger.info(f"CPM = {value}")
-                triggerSensor("gmc_gq_cpm", value, logger)
+                triggerSensor("sensor.gmc_gq_cpm", value, logger)
         
     except Exception as e:
         logger.error(e)  
