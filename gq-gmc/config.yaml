@@ -1,6 +1,6 @@
 name: "GQ GMC"
 description: "Nuclear radiation sensor using serial"
-version: "1.0.24"
+version: "1.0.26"
 slug: "gq-gmc"
 arch:
   - aarch64
@@ -24,3 +24,5 @@ schema:
   GMCtimeout: "int(1,30)"
   UpdateInterval: "int(1,600)"
   LogLevel: list(CRITICAL|ERROR|WARNING|INFO|DEBUG)
+
+homeassistant_api: true
