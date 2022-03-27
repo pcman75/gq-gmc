@@ -30,10 +30,11 @@ cpmq = queue.Queue(60)
 for i in range(60):
     cpmq.put(0) 
 cpm = 0
+gmc_serial_number = 0
 
 def readCPS():
     
-    global cpm, cpmq
+    global cpm, cpmq, gmc_serial_number
     while True:
         try:
             with serial.Serial(aoconfig["GMCport"], aoconfig["GMCbaudrate"], timeout = aoconfig["GMCtimeout"]) as ser:
@@ -63,12 +64,12 @@ def readCPS():
           
 def updateSensor():
     
-    global cpm
+    global cpm, gmc_serial_number
     
     try:
         logger.info(f'Nuclear radiation CPM = {cpm} μSv/h = {cpm*0.39/60}')
-        triggerSensor("sensor.gmc_gq_cpm 2", "Nuclear Radiation CPM 2", cpm, logger)
-        triggerSensor("sensor.gmc_gq_usv 2", "Nuclear Radiation μSvh 2", cpm * 0.39/60, logger)
+        triggerSensor("sensor.gmc_gq_cpm 2", "Nuclear Radiation CPM 2", gmc_serial_number, cpm, logger)
+        triggerSensor("sensor.gmc_gq_usv 2", "Nuclear Radiation μSvh 2", gmc_serial_number, cpm * 0.39/60, logger)
     except Exception as e:
         logger.error(e)  
             
