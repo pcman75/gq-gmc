@@ -68,8 +68,8 @@ def updateSensor():
     
     try:
         logger.info(f'Nuclear radiation CPM = {cpm} μSv/h = {cpm*0.39/60}')
-        triggerSensor("sensor.gmc_gq_cpm 2", "Nuclear Radiation CPM 2", gmc_serial_number, cpm, logger)
-        triggerSensor("sensor.gmc_gq_usv 2", "Nuclear Radiation μSvh 2", gmc_serial_number, cpm * 0.39/60, logger)
+        triggerSensor("sensor.gmc_gq_cpm_2", "Nuclear Radiation CPM 2", gmc_serial_number, cpm, logger)
+        triggerSensor("sensor.gmc_gq_usv_2", "Nuclear Radiation μSvh 2", gmc_serial_number, cpm * 0.39/60, logger)
     except Exception as e:
         logger.error(e)  
             
