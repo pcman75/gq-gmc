@@ -11,7 +11,7 @@ def triggerSensor(name, state, logger):
 
     entity = {
         "state": state,
-        #"state_class": "measurement",
+        "state_class": "measurement",
         "attributes": {
             "friendly_name": name, 
         }
