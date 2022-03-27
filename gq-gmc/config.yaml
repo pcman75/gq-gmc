@@ -1,6 +1,6 @@
 name: "GQ GMC"
 description: "Nuclear radiation sensor using serial"
-version: "1.0.37"
+version: "1.0.38"
 slug: "gq-gmc"
 arch:
   - aarch64
