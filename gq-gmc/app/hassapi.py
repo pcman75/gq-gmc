@@ -11,7 +11,7 @@ def triggerSensor(name, friendly_name, seial_number, state, logger):
 
     entity = {
         "state": state,
-        "unique_id": str(seial_number),
+        #"unique_id": str(seial_number),
         "attributes": {
             "friendly_name": friendly_name,
             "state_class": "measurement",
