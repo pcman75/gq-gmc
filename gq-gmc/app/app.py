@@ -1,4 +1,4 @@
-import json, yaml, threading, logging           # basic modules
+import json, yaml, threading, logging, time           # basic modules
 import pathlib
 import queue
 
@@ -59,6 +59,7 @@ def readCPS():
                     
         except Exception as e:
             logger.error(e) 
+            time.sleep(10)
           
 def updateSensor():
     
