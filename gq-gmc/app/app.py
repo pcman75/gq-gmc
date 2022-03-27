@@ -1,5 +1,6 @@
 import json, yaml, threading, logging           # basic modules
 import pathlib
+import queue
 
 
 # for GMC
@@ -25,26 +26,56 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.setLevel(logging._nameToLevel[aoconfig["LogLevel"]])
 
+cpmq = queue.Queue(60)
+for i in range(60):
+    cpmq.put(0) 
+cpm = 0
 
-def readCPM():
+def readCPS():
+    
+    global cpm, cpmq
+    while True:
+        try:
+            with serial.Serial(aoconfig["GMCport"], aoconfig["GMCbaudrate"], timeout = aoconfig["GMCtimeout"]) as ser:
+                
+                bwrt = ser.write(b'<GETVER>>')
+                srec = ser.read(14) # total 14 bytes ASCII chars from GQ GMC unit. It includes 7 bytes hardware model and 7 bytes firmware version.
+                logger.info(f'GQ GMC Model: {srec.decode("UTF-8")}')
+                
+                bwrt = ser.write(b'<GETSERIAL>>')  # serial number in 7 bytes
+                srec = ser.read(7)
+                gmc_serial_number = int.from_bytes(srec, 'big')
+                logger.info(f'GQ GMC Serial: {gmc_serial_number}')
+                
+                bwrt = ser.write(b'<HEARTBEAT1>>')  # send count per second data to host every second automatically
+                while True:
+                    srec = ser.read(2)    
+                    value = srec[0] << 8 | srec[1]
+                    value = value & 0x3fff   # mask out high bits, as for CPS* calls on 300 series counters
+                    cpm = cpm - cpmq.get() + value        
+                    cpmq.put(value)
+                    
+                    logger.debug(f'CPS = {value} CPM = {cpm} μSv/h = {cpm*0.39/60}')
+                    
+        except Exception as e:
+            logger.error(e) 
+          
+def updateSensor():
+    
+    global cpm
+    
     try:
-        with serial.Serial(aoconfig["GMCport"], aoconfig["GMCbaudrate"], timeout = aoconfig["GMCtimeout"]) as ser:
-            bwrt = ser.write(b'<GETCPM>>')
-            srec = ser.read(2)
-            if len(srec) == 2:    
-                value = srec[0] << 8 | srec[1]
-                value = value & 0x3fff   # mask out high bits, as for CPS* calls on 300 series counters
-                logger.info(f"CPM = {value}")
-                triggerSensor("sensor.gmc_gq_cpm1", "Nuclear Radiation CPM 1", value, logger)
-                triggerSensor("sensor.gmc_gq_usvh1", "Nuclear Radiation μSvh 1", value * 0.39/60, logger)
-        
+        logger.info(f'Nuclear radiation CPM = {cpm} μSv/h = {cpm*0.39/60}')
+        triggerSensor("sensor.gmc_gq_cpm 2", "Nuclear Radiation CPM 2", cpm, logger)
+        triggerSensor("sensor.gmc_gq_usv 2", "Nuclear Radiation μSvh 2", cpm * 0.39/60, logger)
     except Exception as e:
         logger.error(e)  
             
-    threading.Timer(aoconfig["UpdateInterval"], readCPM).start()
-    
+    threading.Timer(aoconfig["UpdateInterval"], updateSensor).start()
+     
 def main():
-    readCPM()
+    threading.Timer(aoconfig["SensorWarmupTime"], updateSensor).start()
+    readCPS()
     
 if __name__ == '__main__':
     main()
