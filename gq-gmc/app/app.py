@@ -35,6 +35,7 @@ def readCPM():
                 value = srec[0] << 8 | srec[1]
                 logger.info(f"CPM = {value}")
                 triggerSensor("sensor.gmc_gq_cpm", "Nuclear Radiation CPM", value, logger)
+                triggerSensor("sensor.gmc_gq_usvh", "Nuclear Radiation μSvh", value * 0.39/60, logger)
         
     except Exception as e:
         logger.error(e)  

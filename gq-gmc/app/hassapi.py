@@ -11,10 +11,10 @@ def triggerSensor(name, friendly_name, state, logger):
 
     entity = {
         "state": state,
-        "state_class": "measurement",
-        "native_value": "float",
         "attributes": {
-            "friendly_name": friendly_name, 
+            "friendly_name": friendly_name,
+            "state_class": "measurement",
+            "native_value": "float" 
         }
     }
     
