@@ -29,7 +29,7 @@ logger.setLevel(logging._nameToLevel[aoconfig["LogLevel"]])
 cpmq = queue.Queue(60)
 for i in range(60):
     cpmq.put(0) 
-cpm = 0
+cpm = -1
 gmc_serial_number = 0
 
 def readCPS():
@@ -59,6 +59,7 @@ def readCPS():
                     logger.debug(f'CPS = {value} CPM = {cpm} μSv/h = {cpm*0.39/60}')
                     
         except Exception as e:
+            cpm = -1
             logger.error(e) 
             time.sleep(10)
           
@@ -67,9 +68,12 @@ def updateSensor():
     global cpm, gmc_serial_number
     
     try:
-        logger.info(f'Nuclear radiation CPM = {cpm} μSv/h = {cpm*0.39/60}')
-        triggerSensor("sensor.gmc_gq_cpm", "Nuclear Radiation CPM", gmc_serial_number, cpm, logger)
-        triggerSensor("sensor.gmc_gq_usv", "Nuclear Radiation μSvh", gmc_serial_number, cpm * 0.39/60, logger)
+        if cpm > 0:
+            logger.info(f'Nuclear radiation CPM = {cpm} μSv/h = {cpm*0.39/60}')
+            triggerSensor("sensor.gmc_gq_cpm", "Nuclear Radiation CPM", gmc_serial_number, cpm, logger)
+            triggerSensor("sensor.gmc_gq_usv", "Nuclear Radiation μSvh", gmc_serial_number, cpm * 0.39/60, logger)
+        else:
+            logger.warning('CPM not yet ready')
     except Exception as e:
         logger.error(e)  
             
