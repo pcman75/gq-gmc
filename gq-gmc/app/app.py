@@ -29,12 +29,13 @@ logger.setLevel(logging._nameToLevel[aoconfig["LogLevel"]])
 cpmq = queue.Queue(60)
 for i in range(60):
     cpmq.put(0) 
-cpm = -1
+cpm = 0
 gmc_serial_number = 0
+gmc_reading = False
 
 def readCPS():
     
-    global cpm, cpmq, gmc_serial_number
+    global cpm, cpmq, gmc_serial_number, gmc_reading
     while True:
         try:
             with serial.Serial(aoconfig["GMCport"], aoconfig["GMCbaudrate"], timeout = aoconfig["GMCtimeout"]) as ser:
@@ -50,17 +51,18 @@ def readCPS():
                 
                 bwrt = ser.write(b'<HEARTBEAT1>>')  # send count per second data to host every second automatically
                 while True:
-                    srec = ser.read(2)    
+                    srec = ser.read(2)
+                    gmc_reading = True    
                     value = srec[0] << 8 | srec[1]
                     value = value & 0x3fff   # mask out high bits, as for CPS* calls on 300 series counters
                     cpm = cpm - cpmq.get() + value        
                     cpmq.put(value)
                     
-                    logger.debug(f'CPS = {value} CPM = {cpm} μSv/h = {cpm*0.39/60}')
+                    logger.debug(f'CPS = {value} CPM = {cpm} nSv/h = {int(1000 * cpm * 0.39/60)}')
                     
         except Exception as e:
-            cpm = -1
-            logger.error(e) 
+            logger.error(e)
+            gmc_reading = False 
             time.sleep(10)
           
 def updateSensor():
@@ -68,10 +70,10 @@ def updateSensor():
     global cpm, gmc_serial_number
     
     try:
-        if cpm > 0:
-            logger.info(f'Nuclear radiation CPM = {cpm} μSv/h = {cpm*0.39/60}')
+        if gmc_reading:
+            logger.info(f'Nuclear radiation CPM = {cpm} nSv/h = {int(1000 * cpm * 0.39/60)}')
             triggerSensor("sensor.gmc_gq_cpm", "Nuclear Radiation CPM", gmc_serial_number, cpm, logger)
-            triggerSensor("sensor.gmc_gq_usv", "Nuclear Radiation μSvh", gmc_serial_number, cpm * 0.39/60, logger)
+            triggerSensor("sensor.gmc_gq_nsv", "Nuclear Radiation nSvh", gmc_serial_number, int(1000 * cpm * 0.39/60), logger)
         else:
             logger.warning('CPM not yet ready')
     except Exception as e:
