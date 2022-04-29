@@ -9,15 +9,24 @@ def triggerSensor(name, friendly_name, seial_number, state, logger):
         "content-type": "application/json"
     }
 
-    entity = {
-        "state": state,
-        #"unique_id": str(seial_number),
-        "attributes": {
-            "friendly_name": friendly_name,
-            "state_class": "measurement",
-            "native_value": "float" 
+    if(type(state) is float):
+        entity = {
+            "state": state,
+            #"unique_id": str(seial_number),
+            "attributes": {
+                "friendly_name": friendly_name,
+                "state_class": "measurement",
+                "native_value": "float" 
+            }
         }
-    }
+    else:
+        entity = {
+            "state": state,
+            #"unique_id": str(seial_number),
+            "attributes": {
+                "friendly_name": friendly_name,
+            }
+        }
     
     logger.debug(f'posting to http://supervisor/core/api/states/{name}')
     

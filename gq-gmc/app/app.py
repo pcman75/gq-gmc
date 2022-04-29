@@ -74,6 +74,17 @@ def updateSensor():
             logger.info(f'Nuclear radiation CPM = {cpm} nSv/h = {int(1000 * cpm * 0.39/60)}')
             triggerSensor("sensor.gmc_gq_cpm", "Nuclear Radiation CPM", gmc_serial_number, cpm, logger)
             triggerSensor("sensor.gmc_gq_nsv", "Nuclear Radiation nSvh", gmc_serial_number, int(1000 * cpm * 0.39/60), logger)
+            if(cpm <= 50):
+                level = "normal"
+            elif(cpm <= 100):
+                level = "medium"
+            elif(cpm <= 1000):
+                level = "high"
+            elif(cpm <= 2000):
+                level = "very high"
+            else:
+                level = "extremely high"
+            triggerSensor("sensor.gmc_gq_safety_level", "Nuclear Radiation Safety Level", gmc_serial_number, level, logger)
         else:
             logger.warning('CPM not yet ready')
     except Exception as e:
