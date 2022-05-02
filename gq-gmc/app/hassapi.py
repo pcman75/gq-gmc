@@ -1,4 +1,4 @@
-import os, requests
+import os, requests, numbers
 
 
 def triggerSensor(name, friendly_name, seial_number, state, logger):
@@ -9,7 +9,8 @@ def triggerSensor(name, friendly_name, seial_number, state, logger):
         "content-type": "application/json"
     }
 
-    if(type(state) is float):
+    if(isinstance(state, numbers.Number)):
+        logger.debug("state is numeric")
         entity = {
             "state": state,
             #"unique_id": str(seial_number),
@@ -20,6 +21,7 @@ def triggerSensor(name, friendly_name, seial_number, state, logger):
             }
         }
     else:
+        logger.debug("state is not numeric")
         entity = {
             "state": state,
             #"unique_id": str(seial_number),
